@@ -1,0 +1,62 @@
+const assert = require('assert');
+const ganache = require('ganache-cli');
+const Web3 = require('web3');
+const web3 = new Web3(ganache.provider());
+
+const compiledRegistration = require('../ethereum/build/Registration.json');
+
+let accounts;
+let ownerAccount;
+let registrationContract;
+
+beforeEach(async () => {
+    accounts = await web3.eth.getAccounts();
+    ownerAccount = accounts[0];
+
+    registrationContract = await new web3.eth.Contract(JSON.parse(compiledRegistration.interface))
+                    .deploy({ data: compiledRegistration.bytecode })
+                    .send({ from: ownerAccount, gas: '1000000' });
+});
+
+describe('Registration', () => {
+
+    it('should deploy contract', () => {
+        assert.ok(registrationContract.options.address);
+    });
+
+    it('owner should be able to invite user', () => {
+
+        const mail = 'user1@data.com'
+    });
+
+    it('should process request [e2e test]', async () => {
+
+        const accountManager = accounts[0];
+        const accountReceiverOfRequest = accounts[1];
+        const accountContributor = accounts[2];
+
+        const weiToFloat = wei => parseFloat(web3.utils.fromWei(wei, 'ether'));
+
+        await campaign.methods.contribute().send({
+            from: accountContributor,
+            value: web3.utils.toWei('10', 'ether')
+        });
+
+        await campaign.methods
+                .createRequest('Buy laptop', web3.utils.toWei('3', 'ether'), accountReceiverOfRequest)
+                .send({ from: accountManager, gas: '1000000' }); 
+
+        await campaign.methods.approveRequest(0).send({ from: accountContributor, gas: '1000000' });
+
+        let oldBalance = await web3.eth.getBalance(accountReceiverOfRequest);
+        oldBalance = weiToFloat(oldBalance);
+
+        await campaign.methods.finalizeRequest(0).send({ from: accountManager, gas: '1000000' });
+
+        let balance = await web3.eth.getBalance(accountReceiverOfRequest);
+        balance = weiToFloat(balance);
+
+        // TODO: improve this assertion
+        assert(balance === oldBalance + 3);
+    });
+});
