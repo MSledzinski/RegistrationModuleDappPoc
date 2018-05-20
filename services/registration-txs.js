@@ -1,14 +1,14 @@
 const registrationInstanceProvider = require('./registration-contract-provider');
 const web3 = require('./web3-provider');
-const hashUtils = require('hash-utils');
+const utils = require('./web2-utils');
 
 modeul.exports = {
     inviteUser: async (email, secret) => {
         
         const ownerAccount = web3.eth.getAccounts()[0];
 
-        const emailHash = hashUtils.hashString(email);
-        const secretHash = hashUtils.hashString(secret);
+        const emailHash = utils.hashString(email);
+        const secretHash = utils.hashString(secret);
 
         await registrationInstanceProvider.getInstance().methods.inviteUser(emailHash, secretHash).send({ from: ownerccount });
     },
@@ -17,9 +17,9 @@ modeul.exports = {
 
         const account = web3.eth.getAccounts()[0];
 
-        const emailHash = hashUtils.hashString(email);
-        const secretHash = hashUtils.hashString(secret);
-        const nickBytes = "0x1";
+        const emailHash = utils.hashString(email);
+        const secretHash = utils.hashString(secret);
+        const nickBytes = utils.stringToBytes(nick);
 
         await registrationInstanceProvider.getInstance().methods.acceptMe(emailHash, secretHash, nickBytes).send({ from: accounts });
     }

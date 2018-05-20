@@ -14,6 +14,7 @@ contract Registration {
     address public owner;
 
     mapping (address => User) public users;
+    mapping (bytes32 => address) mailHashToAddress;
 
     mapping (bytes32 => bytes32) mailHashToChallange;
     mapping (bytes32 => bool) invitedMails;
@@ -43,20 +44,26 @@ contract Registration {
         mailHashToChallange[_mailHash] = _challangeHash;
     }
 
+    function remove(bytes32 _mailHash) onlyOwner public {   
+
+       // TODO: clear all realted data
+    }
+
     function activateMe(bytes32 _mailHash, bytes _nickName, bytes _challange) public {
 
+        // challange/invitation does exist
         require(mailHashToChallange[_mailHash].length != 0, "Cannot activate");
-        require(users[msg.sender].id != address(0), "Cannot activate, duplicate");
-        
-        //require(_mailHash.length == 0, "Mail hash empty");
-        //require(_challange.length == 0, "Empty challange");
 
+        // however users is not activated - so user with this address does not exist
+        require(users[msg.sender].id == address(0), "Cannot activate, duplicate");
+        
         bytes32 sentChallangeHash = keccak256(_challange);
 
         require(sentChallangeHash == mailHashToChallange[_mailHash], "Challange does not match");
 
         // now - used only for information, not part of business logic
         users[msg.sender] = User({ id: msg.sender, mailHash: _mailHash, name: _nickName, createdAt: now});
+        mailHashToAddress[_mailHash] = msg.sender;
 
         emit UserRegistered(msg.sender, _nickName);
     }
@@ -67,14 +74,6 @@ contract Registration {
 
     function amIRegistered() public view returns (bool) {
         return isRegistered(msg.sender);
-    }
-
-    function blacklist(bytes32 _mailHash) onlyOwner public {
-
-    }
-
-    function unblacklist(bytes32 _mailHash) onlyOwner public {
-
     }
 
     function() public payable {

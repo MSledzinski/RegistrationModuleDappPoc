@@ -1,6 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
-const compiledFactory = require('./build/CampaignFactory.json');
+const compiledFactory = require('./build/Registration.json');
 const fs = require('fs-extra');
 
 // TODO: hide creds, event if this is account used only for this workshop project

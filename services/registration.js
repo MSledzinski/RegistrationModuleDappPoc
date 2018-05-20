@@ -1,8 +1,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const random = require('random-js');
-const mailSender = require('./mail-sender.js')
-const hashUtils = require('./hash-utils.js');
+const mailSender = require('./mail-sender.js');
 const logger = require('./logger');
 const registrationEthTxs = require('./registration-txs');
 
@@ -17,7 +16,7 @@ const setupWordsAndCrypto = () =>{
         return wordsBuffer;
     }
 
-    // NOTE: CLRF on windoes
+    // NOTE: CLRF on windows
     const wordpath = path.join(__dirname, 'words.txt');
     const words = fs.readFileSync(wordpath).toString('utf-8').split("\r\n");
 
@@ -53,8 +52,6 @@ module.exports = {
         setupWordsAndCrypto();
 
         const passphrase = generatePassphrase(10, readWords());
-
-        logger.info(`Mail: ${email} - H: ${ hashUtils.hashString(passphrase) }`);
 
         await registrationEthTxs.invite(email, passphrase);
         
