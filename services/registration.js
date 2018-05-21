@@ -1,3 +1,5 @@
+import { get } from 'http';
+
 const path = require('path');
 const fs = require('fs-extra');
 const random = require('random-js');
@@ -46,6 +48,19 @@ const sendMail = (email, mnemonic) => {
     return mailSent;
 };
 
+const getSalt = () => {
+    const saltPath = path.join(__dirname, 'PSEUDOSALT');
+    const salt = fs.readFileSync(saltPath);
+
+    return salt;
+};
+
+const saltEmail = (email) => {
+
+    // NOTE: it is not secure, just simple obfuscation
+    return getSalt() + email;
+};
+
 module.exports = {
     register: async (email) => {
 
@@ -53,7 +68,7 @@ module.exports = {
 
         const passphrase = generatePassphrase(10, readWords());
 
-        await registrationEthTxs.invite(email, passphrase);
+        await registrationEthTxs.invite(saltEmail(email), passphrase);
         
         return sendMail(email, passphrase);
     }
