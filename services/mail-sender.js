@@ -53,13 +53,14 @@ const produceEwsArgs = () => {
             "IsRead": "false"
             }
         }
-        };
+    };
 };
  
 module.exports = { 
-    send:async (email, secret) =>
+    send: async (email, secret) =>
      {
          let arguments = produceEwsArgs();
+
          arguments.Items.Body['$value'] = `Challange secret: ${secret}`;
          arguments.Items.ToRecipients.EmailAddress = email;
 
@@ -70,6 +71,7 @@ module.exports = {
             logger.info('Error sening mail', err);
             return false;           
          }
+
          return true; 
         }
 };

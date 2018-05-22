@@ -17,7 +17,6 @@ contract Registration {
     mapping (bytes32 => address) mailHashToAddress;
 
     mapping (bytes32 => bytes32) mailHashToChallange;
-    mapping (bytes32 => bool) invitedMails;
 
     mapping (bytes32 => bool) public blacklist;
 
@@ -37,16 +36,23 @@ contract Registration {
     */
     function invite(bytes32 _mailHash, bytes32 _challangeHash) onlyOwner public {
 
-        require(invitedMails[_mailHash] == false, "Already invited");
         require(mailHashToChallange[_mailHash] == 0, "Challange exist");
 
-        invitedMails[_mailHash] = true;
         mailHashToChallange[_mailHash] = _challangeHash;
     }
 
+    // TODO: discuss if can remove activated user?
     function remove(bytes32 _mailHash) onlyOwner public {   
 
-       // TODO: clear all realted data
+       address target = mailHashToAddress[_mailHash];
+
+        if (target != address(0)) {
+           // clear user data
+           delete users[target];
+           delete mailHashToAddress[_mailHash];
+       }
+
+        delete mailHashToChallange[_mailHash];
     }
 
     function activateMe(bytes32 _mailHash, bytes _nickName, bytes _challange) public {

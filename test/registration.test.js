@@ -121,4 +121,32 @@ describe('Regsitration contract tests', () => {
         let afterActivation = await contractTestInstance.methods.isRegistered(accounts[1]).call();
         assert.ok(afterActivation === true, "Not Active after activation");
     });
+
+    it('[e2e] should allow owner to invite user and then cancel it and then invite again', async () => {
+
+        const secret = "one two three four five";
+        const secretHash = web3utils.hashString(secret);
+        const secretBytes =  web3utils.stringToBytes(secret);
+
+        const email = "test@data.com";
+        const emailHash = web3utils.hashString(email);
+
+        const nick = 'marek';
+        const nickBytes = web3utils.stringToBytes(nick);
+
+        // Invite new user
+        await contractTestInstance.methods.invite(emailHash, secretHash).send({ from: ownerAccount, gas: '1000000' });
+
+        // Activate the invitation by user
+        await contractTestInstance.methods.activateMe(emailHash, nickBytes, secretBytes).send({ from: accounts[1], gas: '1000000' });
+
+        // Reset user data
+        await contractTestInstance.methods.remove(emailHash).send({ from: ownerAccount, gas: '100000' });
+
+        // Invite user once again 
+        await contractTestInstance.methods.invite(emailHash, secretHash).send({ from: ownerAccount, gas: '1000000' });
+
+        // Operation did not fail
+        assert.ok(true);
+    });
 });
